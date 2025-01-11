@@ -20,7 +20,7 @@ const shippingSchema = new mongoose.Schema({
         type: Date,
         default: Date.now,
     }
-})
+},{versionKey: false})
 
 const shipping = mongoose.model('Shipping', shippingSchema)
 module.exports = shipping;

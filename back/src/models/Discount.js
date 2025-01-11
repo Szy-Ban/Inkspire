@@ -30,7 +30,7 @@ const discountSchema = new mongoose.Schema({
         type: Date,
         required: true,
     }
-})
+},{versionKey: false})
 
 const discount = mongoose.model('Discount', discountSchema);
 module.exports = discount;

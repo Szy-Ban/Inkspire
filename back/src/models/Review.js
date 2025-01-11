@@ -27,7 +27,7 @@ const reviewSchema = new mongoose.Schema({
         type: Date,
         default: Date.now
     }
-})
+},{versionKey: false})
 
 const review = mongoose.model('Review', reviewSchema);
 module.exports = review;

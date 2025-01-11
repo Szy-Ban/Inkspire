@@ -25,7 +25,7 @@ const notificationSchema = new mongoose.Schema({
         type: Date,
         default: Date.now
     }
-})
+},{versionKey: false})
 
 const notification = mongoose.model('Notification', notificationSchema);
 module.exports = notification;

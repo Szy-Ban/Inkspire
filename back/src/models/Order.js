@@ -17,7 +17,7 @@ const orderItemSchema = new mongoose.Schema({
         required: true,
         min: 0
     }
-})
+},{versionKey: false})
 
 const shippingAddressSchema = new mongoose.Schema({
     street: {
@@ -44,7 +44,7 @@ const shippingAddressSchema = new mongoose.Schema({
         minlength: 5,
         maxlength: 5,
     }
-})
+},{versionKey: false})
 
 const orderSchema = new mongoose.Schema({
     userId: {
@@ -90,7 +90,7 @@ const orderSchema = new mongoose.Schema({
         type: Date,
         default: Date.now
     }
-})
+},{versionKey: false})
 
 calculateTotalPrice(orderSchema);
 

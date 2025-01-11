@@ -16,13 +16,13 @@ const categorySchema = new mongoose.Schema({
     },
     path: {
         type: String,
-        required: true,
+        required: false,
     },
     createdAt: {
         type: Date,
         default: Date.now
     }
-})
+},{versionKey: false});
 
 //dynamic path generation for easier reading
 pathGeneration(categorySchema)

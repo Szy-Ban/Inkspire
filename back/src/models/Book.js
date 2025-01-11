@@ -43,7 +43,7 @@ const bookSchema = new mongoose.Schema({
         type: Date,
         default: Date.now
     }
-})
+},{versionKey: false})
 
 const book = mongoose.model('Book', bookSchema)
 module.exports = book;
