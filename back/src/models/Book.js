@@ -11,7 +11,6 @@ const bookSchema = new mongoose.Schema({
     author: {
         type: String,
         required: true,
-        unique: true,
         minlength: 5,
         maxlength: 64,
     },
