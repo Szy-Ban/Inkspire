@@ -93,6 +93,7 @@ const cancelOrder = async (req, res) => {
 
         order.status = 'cancelled'
         order.updatedAt = Date.now()
+        await order.save()
 
         return res.status(200).json({message: "Order has been successfully cancelled!", order})
 

@@ -77,7 +77,7 @@ const updateBook = async (req, res) => {
         }
         if(!book){
             return res.status(404).json({
-                message: 'Book not found!'
+                message: 'Request body not found!'
             })
         }
 
