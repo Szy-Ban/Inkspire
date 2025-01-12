@@ -1,17 +1,22 @@
 const express = require('express');
 const cors = require('cors');
 const connectDb = require('./config/db');
+const helmet = require('helmet');
 const booksRoutes = require('./routes/booksRoutes');
 const categoriesRoutes = require('./routes/categoriesRoutes');
 const ordersRoutes = require('./routes/ordersRoutes');
 const authRoutes = require('./routes/authRoutes');
 const usersRoutes = require('./routes/usersRoutes');
 
+
 const app = express();
 const port = 5000;
 
 app.use(cors());
 app.use(express.json());
+app.use(helmet({
+    hsts: false,
+}));
 
 connectDb();
 

@@ -187,6 +187,30 @@ const updateUserAddress = async (req, res) => {
     }
 };
 
+const deleteUserAddress = async (req, res) => {
+    try {
+        const { id, addressId } = req.params;
+
+        const user = await User.findById(id);
+
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        const address = user.addresses.id(addressId);
+
+        if (!address) {
+            return res.status(404).json({ error: 'Address not found' });
+        }
+
+        user.addresses.pull(addressId)
+        await user.save();
+        res.status(200).json({ message: 'Address deleted successfully' });
+
+    } catch (error) {
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
 
 module.exports = {
     registerUser,
@@ -195,5 +219,6 @@ module.exports = {
     deleteUser,
     getUserAddresses,
     addUserAddress,
-    updateUserAddress
+    updateUserAddress,
+    deleteUserAddress
 }
