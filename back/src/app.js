@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const connectDb = require('./config/db');
 const helmet = require('helmet');
+const trimRequestBody = require('./middlewares/trimRequestBody');
 const booksRoutes = require('./routes/booksRoutes');
 const categoriesRoutes = require('./routes/categoriesRoutes');
 const ordersRoutes = require('./routes/ordersRoutes');
@@ -17,6 +18,7 @@ app.use(express.json());
 app.use(helmet({
     hsts: false,
 }));
+app.use(trimRequestBody);
 
 connectDb();
 

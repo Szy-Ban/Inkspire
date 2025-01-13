@@ -82,6 +82,11 @@ const updateBook = async (req, res) => {
         }
 
         const updateBook = await Book.findByIdAndUpdate(id, book, {new: true})
+
+        if (!updateBook) {
+            return res.status(404).json({ error: "Book not found" });
+        }
+
         return res.status(200).json(updateBook)
 
 
@@ -102,6 +107,11 @@ const deleteBook = async (req, res) => {
         }
 
         const deleteBook = await Book.findByIdAndDelete(id)
+
+        if (!deleteBook) {
+            return res.status(404).json({ error: "Book not found" });
+        }
+
         return res.status(200).json(deleteBook)
 
 

@@ -60,6 +60,7 @@ const orderSchema = new mongoose.Schema({
         type: Number,
         required: true,
         min: 0,
+        immutable: true
     },
     shippingId: {
         type: mongoose.Schema.Types.ObjectId,

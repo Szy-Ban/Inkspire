@@ -70,6 +70,11 @@ const updateCategory = async (req, res) => {
         }
 
         const updatedCategory = await Category.findByIdAndUpdate(id, category)
+
+        if (!updatedCateogry) {
+            return res.status(404).json({ error: "Category not found" });
+        }
+
         return res.status(200).json(updatedCategory)
 
     } catch (err) {
@@ -87,6 +92,11 @@ const deleteCategory = async (req, res) => {
         }
 
         const deleteCategory = await Category.findByIdAndDelete(id)
+
+        if (!deleteCategory) {
+            return res.status(404).json({ error: "Category not found" });
+        }
+
         return res.status(200).json(deleteCategory)
 
     } catch (err) {

@@ -5,6 +5,7 @@ const shippingSchema = new mongoose.Schema({
         type: String,
         required: true,
         minlength: 5,
+        maxlength: 32,
     },
     price: {
         type: Number,
@@ -15,6 +16,7 @@ const shippingSchema = new mongoose.Schema({
         type: String,
         required: true,
         minLength: 5,
+        maxlength: 32
     },
     createdAt: {
         type: Date,

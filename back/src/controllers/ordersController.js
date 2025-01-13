@@ -67,6 +67,11 @@ const updateOrder = async (req, res) => {
         }
 
         const updateOrder = await Order.findByIdAndUpdate(id, updatedOrder)
+
+        if (!updateOrder) {
+            return res.status(404).json({ error: "Order not found" });
+        }
+
         return res.status(200).json(updateOrder)
 
     } catch (err){
