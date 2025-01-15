@@ -13,6 +13,8 @@ const discountsRoutes = require('./routes/discountsRoutes')
 const reviewsRoutes = require('./routes/reviewsRoutes')
 const inventoryRoutes = require('./routes/inventoryRoutes')
 const notificationsRoutes = require('./routes/notificationsRoutes')
+const cartRoutes = require('./routes/cartRoutes');
+const adminRoutes = require('./routes/adminRoutes');
 
 const app = express();
 const port = 5000;
@@ -36,7 +38,8 @@ app.use('/api/discounts', discountsRoutes)
 app.use('/api/reviews', reviewsRoutes)
 app.use('/api/inventory', inventoryRoutes)
 app.use('/api/notifications', notificationsRoutes)
-
+app.use('/api/carts', cartRoutes)
+app.use('/api/admin', adminRoutes)
 
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);

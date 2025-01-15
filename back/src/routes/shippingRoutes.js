@@ -1,11 +1,14 @@
 const express = require('express')
 const router = express.Router()
 const shippingsController = require('../controllers/shippingsController')
+const verifyToken = require('../middlewares/verifyToken')
+const checkAdminRole = require('../middlewares/checkAdminRole')
 
 router.get('/', shippingsController.getAllShippings)
-router.post('/', shippingsController.addShipping)
 router.get('/:id', shippingsController.getShippingById)
-router.delete('/:id', shippingsController.deleteShipping)
-router.put('/:id', shippingsController.updateShipping)
+
+router.post('/', verifyToken, checkAdminRole, shippingsController.addShipping)
+router.delete('/:id', verifyToken, checkAdminRole, shippingsController.deleteShipping)
+router.put('/:id', verifyToken, checkAdminRole, shippingsController.updateShipping)
 
 module.exports = router
