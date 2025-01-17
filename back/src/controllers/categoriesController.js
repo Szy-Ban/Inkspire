@@ -71,7 +71,7 @@ const updateCategory = async (req, res) => {
 
         const updatedCategory = await Category.findByIdAndUpdate(id, category)
 
-        if (!updatedCateogry) {
+        if (!updatedCategory) {
             return res.status(404).json({ error: "Category not found" });
         }
 
