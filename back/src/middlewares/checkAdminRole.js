@@ -9,8 +9,7 @@ const checkAdminRole = (req, res, next) => {
         next();
 
     } catch (error) {
-        console.error("Error in admin role check:", error);
-        res.status(500).json({ error: "Internal server error." });
+        res.status(500).json(error);
     }
 };
 
