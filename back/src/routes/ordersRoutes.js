@@ -11,6 +11,6 @@ router.get('/:id', ordersController.getOrderById);
 router.post('/', ordersController.addOrder);
 router.put('/:id', checkAdminRole, ordersController.updateOrder);
 router.patch('/:id', ordersController.cancelOrder);
-
+router.get('/user/:userId', ordersController.getOrderByUserId)
 
 module.exports = router;

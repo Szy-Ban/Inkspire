@@ -36,6 +36,26 @@ const getOrderById = async (req, res) => {
     }
 }
 
+const getOrderByUserId = async (req, res) => {
+    try {
+        const userId = req.params.userId;
+
+        if (!userId) {
+            return res.status(400).json({ message: 'User ID is required.' });
+        }
+
+        const userOrders = await Order.find({ userId });
+
+        if (!userOrders || userOrders.length === 0) {
+            return res.status(404).json({ message: 'No orders found for this user.' });
+        }
+
+        return res.status(200).json(userOrders);
+    } catch (err) {
+        return res.status(400).json(err);
+    }
+};
+
 const addOrder = async (req, res) => {
     try{
 
@@ -113,5 +133,6 @@ module.exports = {
     getOrderById,
     addOrder,
     updateOrder,
-    cancelOrder
+    cancelOrder,
+    getOrderByUserId
 }
