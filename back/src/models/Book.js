@@ -33,7 +33,11 @@ const bookSchema = new mongoose.Schema({
         type: Number,
         required: true,
         min: 0,
-        default: 0
+        default: 0,
+        validate: {
+            validator: Number.isInteger,
+            message: "Number must be a integer"
+        }
     },
     images: {
         type: [String],

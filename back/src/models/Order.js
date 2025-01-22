@@ -1,55 +1,60 @@
-const mongoose = require('mongoose')
-const calculateTotalPrice = require('../middlewares/calculateTotalPrice');
+const mongoose = require("mongoose");
+const calculateTotalPrice = require('../middlewares/calculateTotalPrice')
+
+
+const shippingAddressSchema = new mongoose.Schema({
+    street: {
+        type: String,
+        required: true,
+        minlength: 1,
+        maxlength: 64
+    },
+    city: {
+        type: String,
+        required: true,
+        minlength: 1,
+        maxlength: 64
+    },
+    country: {
+        type: String,
+        required: true,
+        minlength: 1,
+        maxlength: 64
+    },
+    zipCode: {
+        type: String,
+        required: true,
+        minlength: 5,
+        maxlength: 5
+    }
+}, {versionKey: false})
 
 const orderItemSchema = new mongoose.Schema({
     bookId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Book',
+        ref: "Book",
         required: true
     },
     quantity: {
         type: Number,
         required: true,
         min: 1,
+        validate: {
+            validator: Number.isInteger,
+            message: "Number must be a integer"
+        }
     },
     price: {
         type: Number,
         required: true,
         min: 0
     }
-},{versionKey: false})
-
-const shippingAddressSchema = new mongoose.Schema({
-    street: {
-        type: String,
-        required: true,
-        maxlength: 64,
-        minlength: 3,
-    },
-    city: {
-        type: String,
-        required: true,
-        maxlength: 64,
-        minlength: 3,
-    },
-    country: {
-        type: String,
-        required: true,
-        maxlength: 64,
-        minlength: 3,
-    },
-    zipCode: {
-        type: String,
-        required: true,
-        minlength: 5,
-        maxlength: 5,
-    }
-},{versionKey: false})
+}, {versionKey: false})
 
 const orderSchema = new mongoose.Schema({
     userId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
+        ref: "User",
         required: true
     },
     items: {
@@ -64,13 +69,13 @@ const orderSchema = new mongoose.Schema({
     },
     shippingId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Shipping',
+        ref: "Shipping",
         required: true
     },
     status: {
         type: String,
         required: true,
-        enum: ['pending', 'shipped','delivered', 'cancelled'],
+        enum: ['pending', 'shipped', 'delivered', 'cancelled', 'ordered'],
         default: 'pending'
     },
     paymentMethod: {
@@ -91,9 +96,9 @@ const orderSchema = new mongoose.Schema({
         type: Date,
         default: Date.now
     }
-},{versionKey: false})
+}, { versionKey: false });
 
-calculateTotalPrice(orderSchema);
+calculateTotalPrice(orderSchema)
 
-const order = mongoose.model('Order', orderSchema)
+const order = mongoose.model('Order', orderSchema);
 module.exports = order;
