@@ -1,15 +1,19 @@
 const express = require('express');
 const router = express.Router();
-const usersController = require('../controllers/usersController');
+const UserController = require('../controllers/UsersController');
 const verifyToken = require('../middlewares/verifyToken');
 
-router.post('/register', usersController.registerUser)
-router.get('/:id/profile', verifyToken, usersController.getUserById)
-router.put('/:id/profile', verifyToken, usersController.updateUser)
-router.delete('/:id/profile', verifyToken, usersController.deleteUser)
-router.get('/:id/addresses', verifyToken, usersController.getUserAddresses)
-router.post('/:id/addresses', verifyToken, usersController.addUserAddress)
-router.put('/:id/addresses/:addressId', verifyToken, usersController.updateUserAddress)
-router.delete('/:id/addresses/:addressId', verifyToken, usersController.deleteUserAddress)
+router.post('/register', UserController.registerUser);
+
+router.use(verifyToken);
+
+router.get('/profile', UserController.getUserProfile);
+router.put('/profile', UserController.updateUserProfile);
+router.delete('/profile', UserController.deleteUserProfile);
+
+router.get('/addresses', UserController.getUserAddresses);
+router.post('/addresses', UserController.addUserAddress);
+router.put('/addresses/:addressId', UserController.updateUserAddress);
+router.delete('/addresses/:addressId', UserController.deleteUserAddress);
 
 module.exports = router;

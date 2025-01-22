@@ -1,63 +1,97 @@
-const Review = require('../models/Review')
+const Review = require("../models/Review");
+const mongoose = require('mongoose');
+
 
 const getAllReviews = async (req, res) => {
     try {
+        const { bookId } = req.query;
 
-        const allReviews = await Review.find({})
-
-        if(!allReviews){
-            return res.status(404).json({message: "Reviews not found!"})
+        if (!bookId) {
+            return res.status(400).json({ message: "Book ID is required." });
         }
 
-        return res.status(200).json(allReviews)
+        const aggregateResult = await Review.aggregate([
+            { $match: { bookId: new mongoose.Types.ObjectId(bookId) } },
+            {
+                $group: {
+                    _id: "$bookId",
+                    averageRating: { $avg: "$rating" },
+                    totalReviews: { $sum: 1 }
+                }
+            }
+        ]);
 
-    } catch (err) {
-        return res.status(404).json(err)
+        const reviews = await Review.find({ bookId: bookId });
+
+        if (!reviews || reviews.length === 0) {
+            return res.status(404).json({
+                message: "No reviews found for this book.",
+                averageRating: null,
+                totalReviews: 0
+            });
+        }
+
+        const { averageRating = 0, totalReviews = 0 } = aggregateResult[0] || {};
+
+        return res.status(200).json({
+            averageRating: averageRating.toFixed(2),
+            totalReviews,
+            reviews
+        });
+    } catch (error) {
+        console.error("Error fetching reviews:", error);
+        return res.status(500).json({ error: "Internal server error." });
     }
-}
+};
+
 
 const addReview = async (req, res) => {
     try {
+        const userId = req.user.id;
+        const { bookId, rating, comment } = req.body;
 
-        const reviewData = req.body
-
-        if(!reviewData){
-            return res.status(404).json({message: "Request body empty!"})
+        if (!bookId || !rating || !comment) {
+            return res.status(400).json({ message: "Book ID, rating, and comment are required." });
         }
 
-        const addReview = new Review(reviewData)
-        const savedReview = addReview.save()
-        return res.status(200).json({message: "Review added successfully!"})
+        const newReview = new Review({
+            userId,
+            bookId,
+            rating,
+            comment,
+        });
 
-    } catch (err) {
-        return res.status(404).json(err)
+        const savedReview = await newReview.save();
+        return res.status(201).json({ message: "Review added successfully.", review: savedReview });
+    } catch (error) {
+        console.error("Error adding review:", error);
+        return res.status(500).json({ error: "Internal server error." });
     }
-}
+};
 
 const deleteReview = async (req, res) => {
     try {
+        const reviewId = req.params.id;
 
-        const id = req.params.id
-
-        if(!id){
-            return res.status(404).json({message: "Invalid ID (format)!"})
+        if (!reviewId) {
+            return res.status(400).json({ message: "Review ID is required." });
         }
 
-        const deleteReview = await Review.findByIdAndDelete(id)
+        const deletedReview = await Review.findByIdAndDelete(reviewId);
 
-        if(!deleteReview){
-            return res.status(404).json({message: "Review not found!"})
+        if (!deletedReview) {
+            return res.status(404).json({ message: "Review not found." });
         }
 
-        return res.status(200).json({message: "Review deleted successfully!"})
-
-    } catch (err) {
-        return res.status(404).json(err)
+        return res.status(200).json({ message: "Review deleted successfully." });
+    } catch (error) {
+        console.error("Error deleting review:", error);
+        return res.status(500).json({ error: "Internal server error." });
     }
-}
+};
 
 module.exports = {
     getAllReviews,
     addReview,
-    deleteReview
-}
+    deleteReview,
+};
