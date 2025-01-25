@@ -100,7 +100,7 @@ export default function Register() {
                     <p className="text-red-500 text-sm mb-4">{formik.errors.serverError}</p>
                 )}
 
-                <div className="grid grid-cols-2 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div>
                         <h2 className="text-lg font-bold text-primaryBlue mb-4">Personal Information</h2>
                         {['name', 'surname', 'email', 'password', 'confirmPassword'].map((field) => (
@@ -194,7 +194,6 @@ export default function Register() {
                 >
                     {formik.isSubmitting ? "Registering..." : "Register"}
                 </Button>
-
             </form>
         </div>
     );

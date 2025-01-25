@@ -18,7 +18,7 @@ export default function CategoriesMenu() {
                 {categories.map((category, index) => (
                     <li
                         key={index}
-                        className="px-4 py-2 text-primaryBlue font-secondary text-lg lg:text-xl hover:underline hover:text-secondaryBlue cursor-pointer border-gray-300 lg:border-r lg:last:border-none"
+                        className="px-4 py-2 text-primaryBlue font-secondary text-md lg:text-lg hover:underline hover:text-secondaryBlue cursor-pointer border-gray-300 lg:border-r lg:last:border-none"
                     >
                         {category}
                     </li>
