@@ -1,10 +1,10 @@
 'use client';
 
-import Logo from '@/components/Header/Logo';
-import SearchBar from '@/components/Header/SearchBar';
-import CartIcon from '@/components/Header/CartIcon';
-import CategoriesMenu from '@/components/Header/CategoriesMenu';
-import UserMenu from '@/components/Header/UserMenu';
+import Logo from '@/app/_components/Header/Logo';
+import SearchBar from '@/app/_components/Header/SearchBar';
+import CartIcon from '@/app/_components/Header/CartIcon';
+import CategoriesMenu from '@/app/_components/Header/CategoriesMenu';
+import UserMenu from '@/app/_components/Header/UserMenu';
 import { FaBars } from "react-icons/fa";
 import { useState } from 'react';
 
@@ -15,7 +15,6 @@ export default function Header() {
         <header className="relative bg-white shadow-md">
             <div className="container mx-auto flex flex-wrap items-center justify-between px-4 py-4">
                 <Logo />
-                {/*<div className="flex items-center space-x-8">*/}
                     <div className="hidden w-[40%] lg:block">
                         <SearchBar />
                     </div>
@@ -29,7 +28,6 @@ export default function Header() {
                     >
                         <FaBars className="w-8 h-8" />
                     </button>
-                {/*</div>*/}
             </div>
             {isMenuOpen && (
                 <div className="lg:hidden bg-white border-t border-gray-200">
