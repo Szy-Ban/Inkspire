@@ -89,7 +89,7 @@ export default function Register() {
     });
 
     return (
-        <div className="flex flex-col items-center justify-center h-screen bg-gray-100">
+        <div className="flex flex-col items-center justify-start min-h-screen bg-gray-100 py-10">
             <form
                 className="bg-white p-10 rounded-lg shadow-lg w-full max-w-4xl"
                 onSubmit={formik.handleSubmit}
@@ -99,7 +99,6 @@ export default function Register() {
                     <p className="text-red-500 text-sm mb-4">{formik.errors.serverError}</p>
                 )}
 
-                {/* Personal Information */}
                 <div className="grid grid-cols-2 gap-8">
                     <div>
                         <h2 className="text-lg font-bold text-primaryBlue mb-4">Personal Information</h2>
@@ -161,7 +160,6 @@ export default function Register() {
                         ))}
                     </div>
 
-                    {/* Address */}
                     <div>
                         <h2 className="text-lg font-bold text-primaryBlue mb-4">Address</h2>
                         {['street', 'city', 'country', 'zipCode'].map((field) => (
