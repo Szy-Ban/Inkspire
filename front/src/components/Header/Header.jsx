@@ -1,10 +1,10 @@
 'use client';
 
-import Logo from '@/app/_components/Header/Logo';
-import SearchBar from '@/app/_components/Header/SearchBar';
-import CartIcon from '@/app/_components/Header/CartIcon';
-import CategoriesMenu from '@/app/_components/Header/CategoriesMenu';
-import UserMenu from '@/app/_components/Header/UserMenu';
+import Logo from '@/components/Header/Logo';
+import SearchBar from '@/components/Header/SearchBar';
+import CartIcon from '@/components/Header/CartIcon';
+import CategoriesMenu from '@/components/Header/CategoriesMenu';
+import UserMenu from '@/components/Header/UserMenu';
 import { FaBars } from "react-icons/fa";
 import { useState } from 'react';
 

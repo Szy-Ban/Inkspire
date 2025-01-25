@@ -1,6 +1,6 @@
 import Link from "next/link";
-import Button from "@/app/_components/General/Button";
-import UserProfile from "@/app/_components/Header/UserProfile";
+import Button from "@/components/General/Button";
+import UserProfile from "@/components/Header/UserProfile";
 import { useEffect, useState } from "react";
 
 export default function UserMenu() {

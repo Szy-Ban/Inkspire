@@ -4,6 +4,7 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useState } from 'react';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import Button from "@/components/General/Button";
 
 export default function Register() {
     const [showPassword, setShowPassword] = useState(false);
@@ -187,13 +188,13 @@ export default function Register() {
                     </div>
                 </div>
 
-                <button
-                    type="submit"
+                <Button
+                    variant="submit"
                     disabled={formik.isSubmitting}
-                    className="w-full bg-gradient-to-r from-primaryBlue to-secondaryBlue text-white py-3 px-6 rounded shadow hover:opacity-90 transition-opacity"
                 >
-                    {formik.isSubmitting ? 'Registering...' : 'Register'}
-                </button>
+                    {formik.isSubmitting ? "Registering..." : "Register"}
+                </Button>
+
             </form>
         </div>
     );

@@ -15,7 +15,7 @@ export default function Button({ variant = "primary", size = "medium", children,
 
     return (
         <button
-            type={isSubmitVariant ? "submit" : props.type}
+            type={isSubmitVariant ? "submit" : props.type || "button"}
             disabled={disabled}
             className={`${baseStyles} ${variants[variant]} ${!isSubmitVariant && sizes[size]} ${
                 disabled ? "opacity-50 cursor-not-allowed" : ""
