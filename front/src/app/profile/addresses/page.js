@@ -11,6 +11,7 @@ export default function Addresses() {
     const [addresses, setAddresses] = useState([]);
     const [editIndex, setEditIndex] = useState(null);
     const [editAddress, setEditAddress] = useState({ street: '', city: '', country: '', zipCode: '' });
+    const [errors, setErrors] = useState({});
     const router = useRouter();
 
     const fetchAddresses = async () => {
@@ -73,13 +74,30 @@ export default function Addresses() {
         },
     });
 
+    const validateEditAddress = () => {
+        const newErrors = {};
+        if (!editAddress.street.trim()) newErrors.street = 'Street is required.';
+        if (!editAddress.city.trim()) newErrors.city = 'City is required.';
+        if (!editAddress.country.trim()) newErrors.country = 'Country is required.';
+        if (!editAddress.zipCode.trim()) {
+            newErrors.zipCode = 'Zip Code is required.';
+        } else if (!/^\d{5}$/.test(editAddress.zipCode)) {
+            newErrors.zipCode = 'Zip Code must be exactly 5 digits.';
+        }
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
     const handleEditAddressChange = (e) => {
         const { name, value } = e.target;
         setEditAddress({ ...editAddress, [name]: value });
+        setErrors({ ...errors, [name]: '' });
     };
 
     const handleEditAddress = async (index) => {
         const addressId = addresses[index]._id;
+
+        if (!validateEditAddress()) return;
 
         try {
             const response = await fetch(`http://localhost:5000/users/addresses/${addressId}`, {
@@ -125,92 +143,65 @@ export default function Addresses() {
         }
     };
 
-    const renderAddresses = () => {
-        return (
-            <ul className="space-y-6">
-                {addresses.map((address, index) => (
-                    <li key={index} className="border-b pb-4">
-                        {editIndex === index ? (
-                            <div className="space-y-4">
-                                <input
-                                    type="text"
-                                    name="street"
-                                    value={editAddress.street}
-                                    onChange={handleEditAddressChange}
-                                    placeholder="Street"
-                                    className="w-full border rounded px-4 py-2"
-                                />
-                                <input
-                                    type="text"
-                                    name="city"
-                                    value={editAddress.city}
-                                    onChange={handleEditAddressChange}
-                                    placeholder="City"
-                                    className="w-full border rounded px-4 py-2"
-                                />
-                                <input
-                                    type="text"
-                                    name="country"
-                                    value={editAddress.country}
-                                    onChange={handleEditAddressChange}
-                                    placeholder="Country"
-                                    className="w-full border rounded px-4 py-2"
-                                />
-                                <input
-                                    type="text"
-                                    name="zipCode"
-                                    value={editAddress.zipCode}
-                                    onChange={handleEditAddressChange}
-                                    placeholder="Zip Code"
-                                    className="w-full border rounded px-4 py-2"
-                                />
-                                <div className="flex space-x-4 mt-4">
-                                    <Button variant="primary" size="small" onClick={() => handleEditAddress(index)}>
-                                        Save
-                                    </Button>
-                                    <Button variant="secondary" size="small" onClick={() => setEditIndex(null)}>
-                                        Cancel
-                                    </Button>
+    const renderAddresses = () => (
+        <ul className="space-y-6">
+            {addresses.map((address, index) => (
+                <li key={index} className="border-b pb-4">
+                    {editIndex === index ? (
+                        <div className="space-y-4">
+                            {['street', 'city', 'country', 'zipCode'].map((field) => (
+                                <div key={field}>
+                                    <input
+                                        type="text"
+                                        name={field}
+                                        value={editAddress[field]}
+                                        onChange={handleEditAddressChange}
+                                        placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
+                                        className={`w-full border rounded px-4 py-2 ${
+                                            errors[field] ? 'border-red-500' : 'border-gray-300'
+                                        }`}
+                                    />
+                                    {errors[field] && <p className="text-red-500 text-sm">{errors[field]}</p>}
                                 </div>
+                            ))}
+                            <div className="flex space-x-4 mt-4">
+                                <Button variant="primary" size="small" onClick={() => handleEditAddress(index)}>
+                                    Save
+                                </Button>
+                                <Button variant="secondary" size="small" onClick={() => setEditIndex(null)}>
+                                    Cancel
+                                </Button>
                             </div>
-                        ) : (
-                            <div className="space-y-2">
-                                <p>
-                                    <strong>Street:</strong> {address.street}
-                                </p>
-                                <p>
-                                    <strong>City:</strong> {address.city}
-                                </p>
-                                <p>
-                                    <strong>Country:</strong> {address.country}
-                                </p>
-                                <p>
-                                    <strong>Zip Code:</strong> {address.zipCode}
-                                </p>
-                                <div className="flex space-x-4 mt-4">
-                                    <Button
-                                        variant="primary"
-                                        size="small"
-                                        onClick={() => {
-                                            setEditIndex(index);
-                                            setEditAddress(address);
-                                        }}
-                                    >
-                                        Edit
+                        </div>
+                    ) : (
+                        <div className="space-y-2">
+                            <p><strong>Street:</strong> {address.street}</p>
+                            <p><strong>City:</strong> {address.city}</p>
+                            <p><strong>Country:</strong> {address.country}</p>
+                            <p><strong>Zip Code:</strong> {address.zipCode}</p>
+                            <div className="flex space-x-4 mt-4">
+                                <Button
+                                    variant="primary"
+                                    size="small"
+                                    onClick={() => {
+                                        setEditIndex(index);
+                                        setEditAddress(address);
+                                    }}
+                                >
+                                    Edit
+                                </Button>
+                                {addresses.length > 1 && (
+                                    <Button variant="secondary" size="small" onClick={() => handleRemoveAddress(index)}>
+                                        Remove
                                     </Button>
-                                    {addresses.length > 1 && (
-                                        <Button variant="secondary" size="small" onClick={() => handleRemoveAddress(index)}>
-                                            Remove
-                                        </Button>
-                                    )}
-                                </div>
+                                )}
                             </div>
-                        )}
-                    </li>
-                ))}
-            </ul>
-        );
-    };
+                        </div>
+                    )}
+                </li>
+            ))}
+        </ul>
+    );
 
     return (
         <div className="flex flex-col md:flex-row bg-gray-100 min-h-screen">

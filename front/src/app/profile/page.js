@@ -9,6 +9,7 @@ export default function Profile() {
     const [user, setUser] = useState(null);
     const [isEditing, setIsEditing] = useState(false);
     const [formData, setFormData] = useState({ name: '', surname: '', email: '' });
+    const [errors, setErrors] = useState({});
     const router = useRouter();
 
     useEffect(() => {
@@ -41,12 +42,28 @@ export default function Profile() {
         fetchUserProfile();
     }, [router]);
 
+    const validateForm = () => {
+        const newErrors = {};
+        if (!formData.name.trim()) newErrors.name = 'Name is required.';
+        if (!formData.surname.trim()) newErrors.surname = 'Surname is required.';
+        if (!formData.email.trim()) {
+            newErrors.email = 'Email is required.';
+        } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+            newErrors.email = 'Invalid email format.';
+        }
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
+        setErrors({ ...errors, [name]: '' });
     };
 
     const handleSave = async () => {
+        if (!validateForm()) return;
+
         try {
             const response = await fetch('http://localhost:5000/users/profile', {
                 method: 'PUT',
@@ -75,36 +92,29 @@ export default function Profile() {
                 <h2 className="text-xl font-semibold mb-4">Personal Information</h2>
                 {isEditing ? (
                     <div className="space-y-4 mb-6">
-                        <input
-                            type="text"
-                            name="name"
-                            value={formData.name}
-                            onChange={handleInputChange}
-                            className="w-full border rounded px-4 py-2"
-                            placeholder="Name"
-                        />
-                        <input
-                            type="text"
-                            name="surname"
-                            value={formData.surname}
-                            onChange={handleInputChange}
-                            className="w-full border rounded px-4 py-2"
-                            placeholder="Surname"
-                        />
-                        <input
-                            type="email"
-                            name="email"
-                            value={formData.email}
-                            onChange={handleInputChange}
-                            className="w-full border rounded px-4 py-2"
-                            placeholder="Email"
-                        />
-                        <Button variant="primary" size="medium" onClick={handleSave}>
-                            Save
-                        </Button>
-                        <Button variant="secondary" size="medium" onClick={() => setIsEditing(false)}>
-                            Cancel
-                        </Button>
+                        {['name', 'surname', 'email'].map((field) => (
+                            <div key={field}>
+                                <input
+                                    type={field === 'email' ? 'email' : 'text'}
+                                    name={field}
+                                    value={formData[field]}
+                                    onChange={handleInputChange}
+                                    className={`w-full border rounded px-4 py-2 ${
+                                        errors[field] ? 'border-red-500' : 'border-gray-300'
+                                    }`}
+                                    placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
+                                />
+                                {errors[field] && <p className="text-red-500 text-sm">{errors[field]}</p>}
+                            </div>
+                        ))}
+                        <div className="space-x-4">
+                            <Button variant="primary" size="medium" onClick={handleSave}>
+                                Save
+                            </Button>
+                            <Button variant="secondary" size="medium" onClick={() => setIsEditing(false)}>
+                                Cancel
+                            </Button>
+                        </div>
                     </div>
                 ) : (
                     <div className="space-y-4 mb-6">
