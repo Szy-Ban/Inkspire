@@ -1,38 +1,44 @@
+'use client';
+
 import Logo from '@/components/Header/Logo';
 import SearchBar from '@/components/Header/SearchBar';
 import CartIcon from '@/components/Header/CartIcon';
 import CategoriesMenu from '@/components/Header/CategoriesMenu';
 import UserMenu from '@/components/Header/UserMenu';
+import { FaBars } from "react-icons/fa";
+import { useState } from 'react';
 
 export default function Header() {
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+
     return (
-        <div className="relative">
-
-            <div className="absolute top-0 left-0 w-full h-[180px] z-0 overflow-hidden">
-                <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 1440 320"
-                    className="w-full h-full"
-                    preserveAspectRatio="none"
-                >
-                    <path
-                        fill="#1B1F3B"
-                        fillOpacity="1"
-                        d="M0,80L120,96C240,112,480,160,720,144C960,128,1200,80,1320,64L1440,48L1440,0L1320,0C1200,0,960,0,720,0C480,0,240,0,120,0L0,0Z"
-                    ></path>
-                </svg>
-            </div>
-
-            <header className="relative z-10 flex flex-row items-center justify-between px-6 pt-16 pb-6">
+        <header className="relative bg-white shadow-md">
+            <div className="container mx-auto flex flex-wrap items-center justify-between px-4 py-4">
                 <Logo />
-                <SearchBar />
-                <div className="flex flex-row items-center space-x-8">
+                {/*<div className="flex items-center space-x-8">*/}
+                    <div className="hidden w-[40%] lg:block">
+                        <SearchBar />
+                    </div>
+                <div className="flex items-center space-x-8">
                     <CartIcon />
                     <UserMenu />
                 </div>
-            </header>
-
-            <CategoriesMenu />
-        </div>
+                    <button
+                        className="lg:hidden text-primaryBlue focus:outline-none"
+                        onClick={() => setIsMenuOpen(!isMenuOpen)}
+                    >
+                        <FaBars className="w-8 h-8" />
+                    </button>
+                {/*</div>*/}
+            </div>
+            {isMenuOpen && (
+                <div className="lg:hidden bg-white border-t border-gray-200">
+                    <CategoriesMenu />
+                </div>
+            )}
+            <div className="hidden lg:block">
+                <CategoriesMenu />
+            </div>
+        </header>
     );
 }

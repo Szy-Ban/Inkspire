@@ -2,12 +2,13 @@ import { FaSearch } from "react-icons/fa";
 
 export default function SearchBar() {
     return (
-        <div className="bg-white flex items-center justify-center px-4 py-3 rounded-full max-w-lg w-full shadow-card border-2 border-goldAccent">
+        <div className="flex bg-white justify-between border border-goldAccent rounded-full px-4 py-2.5 shadow-sm">
             <input
-                className="flex-grow text-primaryBlue placeholder-gray-500 bg-transparent focus:outline-none font-secondary text-lg px-4"
+                type="text"
                 placeholder="Search..."
+                className="flex-grow bg-transparent outline-none text-primaryBlue placeholder-gray-500 text-xl"
             />
-            <button className="ml-2">
+            <button className="">
                 <FaSearch className="w-6 h-6 text-primaryBlue" />
             </button>
         </div>
