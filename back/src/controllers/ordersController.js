@@ -127,16 +127,13 @@ const getAllOrdersByUserId = async (req, res) => {
 
         const userOrders = await Order.find({ userId }).sort({ createdAt: -1 });
 
-        if (!userOrders || userOrders.length === 0) {
-            return res.status(404).json({ message: 'No orders found for this user.' });
-        }
-
         return res.status(200).json(userOrders);
     } catch (err) {
         console.error('Error fetching user orders:', err);
         return res.status(500).json({ error: 'Internal server error.', details: err });
     }
 };
+
 
 const updateOrder = async (req, res) => {
     try {

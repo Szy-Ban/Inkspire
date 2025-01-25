@@ -1,15 +1,15 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import Button from '@/components/General/Button';
+import UserPanel from '@/components/General/UserPanel';
 
 export default function Profile() {
     const [user, setUser] = useState(null);
     const [isEditing, setIsEditing] = useState(false);
     const [formData, setFormData] = useState({ name: '', surname: '', email: '' });
     const router = useRouter();
-    const pathname = usePathname();
 
     useEffect(() => {
         const fetchUserProfile = async () => {
@@ -128,31 +128,7 @@ export default function Profile() {
 
     return (
         <div className="flex flex-col md:flex-row bg-gray-100 min-h-screen">
-            <div className="w-full md:w-1/4 bg-white p-6 shadow">
-                <h2 className="text-lg font-semibold mb-6">User Panel</h2>
-                <ul className="space-y-4">
-                    <li>
-                        <button
-                            className={`w-full text-left px-4 py-2 rounded ${
-                                pathname === '/profile' ? 'bg-primaryBlue text-white' : 'hover:bg-gray-100'
-                            }`}
-                            onClick={() => router.push('/profile')}
-                        >
-                            Profile
-                        </button>
-                    </li>
-                    <li>
-                        <button
-                            className={`w-full text-left px-4 py-2 rounded ${
-                                pathname === '/profile/addresses' ? 'bg-primaryBlue text-white' : 'hover:bg-gray-100'
-                            }`}
-                            onClick={() => router.push('/profile/addresses')}
-                        >
-                            Addresses
-                        </button>
-                    </li>
-                </ul>
-            </div>
+            <UserPanel />
             <div className="w-full md:w-3/4 p-6">{renderContent()}</div>
         </div>
     );

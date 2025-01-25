@@ -1,17 +1,17 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import Button from '@/components/General/Button';
+import UserPanel from '@/components/General/UserPanel';
 
 export default function Addresses() {
     const [addresses, setAddresses] = useState([]);
     const [editIndex, setEditIndex] = useState(null);
     const [editAddress, setEditAddress] = useState({ street: '', city: '', country: '', zipCode: '' });
     const router = useRouter();
-    const pathname = usePathname();
 
     const fetchAddresses = async () => {
         try {
@@ -62,8 +62,8 @@ export default function Addresses() {
                 });
 
                 if (response.ok) {
-                    resetForm(); // Resetuj formularz
-                    fetchAddresses(); // Ponownie pobierz dane z bazy
+                    resetForm();
+                    fetchAddresses();
                 } else {
                     console.error('Failed to add address.');
                 }
@@ -92,7 +92,7 @@ export default function Addresses() {
             });
 
             if (response.ok) {
-                fetchAddresses(); // Odśwież listę adresów po edycji
+                fetchAddresses();
                 setEditIndex(null);
                 setEditAddress({ street: '', city: '', country: '', zipCode: '' });
             } else {
@@ -214,31 +214,7 @@ export default function Addresses() {
 
     return (
         <div className="flex flex-col md:flex-row bg-gray-100 min-h-screen">
-            <div className="w-full md:w-1/4 bg-white p-6 shadow">
-                <h2 className="text-lg font-semibold mb-6">User Panel</h2>
-                <ul className="space-y-4">
-                    <li>
-                        <button
-                            className={`w-full text-left px-4 py-2 rounded ${
-                                pathname === '/profile' ? 'bg-primaryBlue text-white' : 'hover:bg-gray-100'
-                            }`}
-                            onClick={() => router.push('/profile')}
-                        >
-                            Profile
-                        </button>
-                    </li>
-                    <li>
-                        <button
-                            className={`w-full text-left px-4 py-2 rounded ${
-                                pathname === '/profile/addresses' ? 'bg-primaryBlue text-white' : 'hover:bg-gray-100'
-                            }`}
-                            onClick={() => router.push('/profile/addresses')}
-                        >
-                            Addresses
-                        </button>
-                    </li>
-                </ul>
-            </div>
+            <UserPanel />
             <div className="w-full md:w-3/4 p-6">
                 <div className="p-6 bg-white rounded shadow">
                     <h2 className="text-xl font-semibold mb-4">Addresses</h2>
