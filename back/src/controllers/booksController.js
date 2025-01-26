@@ -172,11 +172,33 @@ const searchBooks = async (req, res) => {
     }
 }
 
+const getCategoriesWithBooks = async (req, res) => {
+    try {
+        const categories = await Category.find();
+
+        const categoriesWithBooks = await Promise.all(
+            categories.map(async (category) => {
+                const books = await Book.find({ categoryId: category._id }).limit(5);
+                return {
+                    _id: category._id,
+                    name: category.name,
+                    books,
+                };
+            })
+        );
+
+        return res.status(200).json(categoriesWithBooks);
+    } catch (err) {
+        return res.status(400).json({ error: "Failed to fetch categories with books", details: err });
+    }
+};
+
 module.exports = {
     getAllBooks,
     getBookById,
     addBook,
     updateBook,
     deleteBook,
-    searchBooks
+    searchBooks,
+    getCategoriesWithBooks
 }
