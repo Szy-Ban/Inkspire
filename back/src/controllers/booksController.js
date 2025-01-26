@@ -193,7 +193,7 @@ const getCategoriesWithBooks = async (req, res) => {
 
 module.exports = {
     getAllBooks,
-    getBookById
+    getBookById,
     addBook,
     updateBook,
     deleteBook,
