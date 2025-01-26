@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useSearchParams } from 'next/navigation';
-import BookCard from '@/components/General/BookCard';
+import { useSearchParams, useRouter } from 'next/navigation';
+import SearchBookCard from "@/components/General/SearchBookCard";
 
 export default function SearchResults() {
     const [books, setBooks] = useState([]);
@@ -11,6 +11,7 @@ export default function SearchResults() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const searchParams = useSearchParams();
+    const router = useRouter();
 
     const [selectedCategories, setSelectedCategories] = useState([]);
     const [selectedAuthors, setSelectedAuthors] = useState([]);
@@ -19,19 +20,21 @@ export default function SearchResults() {
     const [categoriesExpanded, setCategoriesExpanded] = useState(false);
     const [authorsExpanded, setAuthorsExpanded] = useState(false);
 
+
     const fetchBooks = async () => {
         const queryParams = new URLSearchParams();
 
         const title = searchParams.get('title');
+        const categoriesParam = searchParams.get('categories');
+        const authorsParam = searchParams.get('authors');
+        const minPriceParam = searchParams.get('minPrice');
+        const maxPriceParam = searchParams.get('maxPrice');
+
         if (title) queryParams.append('title', title);
-        if (selectedCategories.length > 0) {
-            queryParams.append('categories', selectedCategories.join(','));
-        }
-        if (selectedAuthors.length > 0) {
-            queryParams.append('authors', selectedAuthors.join(','));
-        }
-        if (minPrice) queryParams.append('minPrice', minPrice);
-        if (maxPrice) queryParams.append('maxPrice', maxPrice);
+        if (categoriesParam) queryParams.append('categories', categoriesParam);
+        if (authorsParam) queryParams.append('authors', authorsParam);
+        if (minPriceParam) queryParams.append('minPrice', minPriceParam);
+        if (maxPriceParam) queryParams.append('maxPrice', maxPriceParam);
 
         const queryString = queryParams.toString() ? `?${queryParams.toString()}` : '';
         try {
@@ -43,12 +46,13 @@ export default function SearchResults() {
             setBooks(data);
             setError(null);
         } catch (err) {
-            setError('Failed to fetch books. Please try again.');
+            setError('Books not found or failed to fetch books. Please try again.');
             setBooks([]);
         } finally {
             setLoading(false);
         }
     };
+
 
     const fetchFilters = async () => {
         try {
@@ -70,6 +74,35 @@ export default function SearchResults() {
         }
     };
 
+    // selectedCategory -> params
+    useEffect(() => {
+        const categoriesParam = searchParams.get('categories');
+        if (categoriesParam) {
+            setSelectedCategories(categoriesParam.split(','));
+        } else {
+            setSelectedCategories([]);
+        }
+    }, [searchParams]);
+
+    // url -> seleted category
+    useEffect(() => {
+        const queryParams = new URLSearchParams(searchParams.toString());
+        if (selectedCategories.length > 0) {
+            queryParams.set('categories', selectedCategories.join(','));
+        } else {
+            queryParams.delete('categories');
+        }
+        router.push(`/search?${queryParams.toString()}`);
+    }, [selectedCategories, searchParams, router]);
+
+    useEffect(() => {
+        fetchFilters();
+    }, []);
+
+    useEffect(() => {
+        fetchBooks();
+    }, [selectedCategories, selectedAuthors, minPrice, maxPrice, searchParams]);
+
     const handleCategoryChange = (categoryId) => {
         setSelectedCategories((prev) =>
             prev.includes(categoryId) ? prev.filter((id) => id !== categoryId) : [...prev, categoryId]
@@ -86,33 +119,33 @@ export default function SearchResults() {
         const title = searchParams.get('title') || null;
         const filters = [];
 
-        if (title) filters.push(<span key="title">Title: <strong>"{title}"</strong></span>);
+        if (title) filters.push(
+            <span key="title">Title: <strong>&#34;{title}&#34;</strong></span>
+        );
         if (selectedCategories.length > 0) {
             const selectedCategoryNames = categories
                 .filter((category) => selectedCategories.includes(category._id))
                 .map((category) => category.name)
                 .join(', ');
-            filters.push(<span key="categories">Categories: <strong>{selectedCategoryNames}</strong></span>);
+            filters.push(
+                <span key="categories">Categories: <strong>{selectedCategoryNames}</strong></span>
+            );
         }
         if (selectedAuthors.length > 0) {
             const selectedAuthorNames = selectedAuthors.join(', ');
-            filters.push(<span key="authors">Authors: <strong>{selectedAuthorNames}</strong></span>);
+            filters.push(
+                <span key="authors">Authors: <strong>{selectedAuthorNames}</strong></span>
+            );
         }
         if (minPrice || maxPrice) {
             const priceRange = `${minPrice || '0'} - ${maxPrice || '∞'}`;
-            filters.push(<span key="price">Price: <strong>{priceRange}</strong></span>);
+            filters.push(
+                <span key="price">Price: <strong>{priceRange}</strong></span>
+            );
         }
 
         return filters.length > 0 ? filters : 'Book Catalog';
     };
-
-    useEffect(() => {
-        fetchFilters();
-    }, []);
-
-    useEffect(() => {
-        fetchBooks();
-    }, [selectedCategories, selectedAuthors, searchParams, minPrice, maxPrice]);
 
     return (
         <div className="flex flex-col md:flex-row bg-gray-100 min-h-screen">
@@ -208,7 +241,7 @@ export default function SearchResults() {
                 {!loading && !error && books.length === 0 && <p>No books found.</p>}
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                     {books.map((book) => (
-                        <BookCard key={book._id} book={book} />
+                        <SearchBookCard key={book._id} book={book} />
                     ))}
                 </div>
             </main>

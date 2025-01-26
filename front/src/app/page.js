@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import BookCard from '@/components/General/BookCard';
 import Button from '@/components/General/Button';
 
@@ -8,6 +9,7 @@ export default function Home() {
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const router = useRouter(); // Router for navigation
 
     const fetchBooksByCategory = async () => {
         try {
@@ -30,6 +32,10 @@ export default function Home() {
         fetchBooksByCategory();
     }, []);
 
+    const handleDiscoverMore = (categoryId) => {
+        router.push(`/search?categories=${categoryId}`);
+    };
+
     return (
         <div className="bg-gray-100 min-h-screen">
             <main className="p-6">
@@ -43,7 +49,7 @@ export default function Home() {
                                 <Button
                                     variant="secondaryRev"
                                     size="medium"
-                                    onClick={() => alert(`Discover more books in ${category.name}`)}
+                                    onClick={() => handleDiscoverMore(category._id)}
                                 >
                                     Discover More
                                 </Button>

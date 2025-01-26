@@ -1,10 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function CategoriesMenu() {
     const [categories, setCategories] = useState([]);
     const [error, setError] = useState(null);
+    const router = useRouter();
 
     useEffect(() => {
         const fetchCategories = async () => {
@@ -24,6 +26,10 @@ export default function CategoriesMenu() {
         fetchCategories();
     }, []);
 
+    const handleCategoryClick = (categoryId) => {
+        router.push(`/search?categories=${categoryId}`);
+    };
+
     if (error) {
         return <p className="text-red-500 text-center">{error}</p>;
     }
@@ -35,6 +41,7 @@ export default function CategoriesMenu() {
                     <li
                         key={category._id}
                         className="px-4 py-2 text-primaryBlue font-secondary text-md lg:text-lg hover:underline hover:text-secondaryBlue cursor-pointer border-gray-300 lg:border-r lg:last:border-none"
+                        onClick={() => handleCategoryClick(category._id)}
                     >
                         {category.name}
                     </li>
