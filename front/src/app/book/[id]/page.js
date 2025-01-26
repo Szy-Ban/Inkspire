@@ -17,6 +17,8 @@ export default function BookDetails() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [userReview, setUserReview] = useState(null);
+    const [quantity, setQuantity] = useState(1);
+    const [showPopup, setShowPopup] = useState(false);
 
     const fetchReviews = async () => {
         try {
@@ -57,6 +59,35 @@ export default function BookDetails() {
 
         fetchBookDetails();
     }, [id]);
+
+    const handleAddToCart = async () => {
+        try {
+            const response = await fetch('http://localhost:5000/api/carts/cart/items', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${localStorage.getItem('token')}`,
+                },
+                body: JSON.stringify({ bookId: id, quantity }),
+            });
+
+            if (!response.ok) throw new Error('Failed to add to cart');
+
+            setShowPopup(true);
+            setTimeout(() => setShowPopup(false), 2000);
+        } catch (err) {
+            console.error(err);
+            alert('Failed to add book to cart.');
+        }
+    };
+
+    const handleQuantityChange = (type) => {
+        setQuantity((prev) => {
+            if (type === 'increment') return prev + 1;
+            if (type === 'decrement' && prev > 1) return prev - 1;
+            return prev;
+        });
+    };
 
     const formik = useFormik({
         initialValues: {
@@ -117,6 +148,11 @@ export default function BookDetails() {
 
     return (
         <div className="p-6 bg-gray-100 min-h-screen">
+            {showPopup && (
+                <div className="fixed top-10 right-10 bg-green-500 text-white p-4 rounded shadow-lg z-50">
+                    Book added to cart!
+                </div>
+            )}
             {book && (
                 <>
                     <div className="bg-white p-6 rounded shadow-md flex flex-col md:flex-row items-center md:items-start mb-6">
@@ -133,7 +169,16 @@ export default function BookDetails() {
                             <p className="text-gray-600 mb-4">{book.description}</p>
                             <p className="text-gray-600 mb-4">Stock: {book.stock}</p>
                             <p className="text-lg font-bold mb-4">${book.price.toFixed(2)}</p>
-                            <Button variant="primary" size="medium" onClick={() => alert('Added to cart!')}>
+                            <div className="flex items-center mb-4">
+                                <Button variant="secondary" size="small" onClick={() => handleQuantityChange('decrement')}>
+                                    -
+                                </Button>
+                                <p className="mx-4">{quantity}</p>
+                                <Button variant="secondary" size="small" onClick={() => handleQuantityChange('increment')}>
+                                    +
+                                </Button>
+                            </div>
+                            <Button variant="primary" size="medium" onClick={handleAddToCart}>
                                 Add to Cart
                             </Button>
                         </div>
