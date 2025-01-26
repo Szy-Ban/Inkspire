@@ -1,8 +1,15 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import Button from '@/components/General/Button';
 
 export default function BookCard({ book }) {
+    const router = useRouter();
+
+    const handleViewDetails = () => {
+        router.push(`/book/${book._id}`);
+    };
+
     return (
         <div className="flex flex-col items-center p-3 bg-white rounded-lg shadow-md hover:shadow-lg transition">
             <img
@@ -12,7 +19,7 @@ export default function BookCard({ book }) {
             />
             <h3 className="text-md font-bold text-center">{book.title}</h3>
             <p className="text-sm text-gray-600 text-center mb-2">{book.author}</p>
-            <Button variant="primary" size="small">
+            <Button variant="primary" size="small" onClick={handleViewDetails}>
                 View Details
             </Button>
         </div>

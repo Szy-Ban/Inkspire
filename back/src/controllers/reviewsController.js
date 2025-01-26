@@ -16,33 +16,26 @@ const getAllReviews = async (req, res) => {
                 $group: {
                     _id: "$bookId",
                     averageRating: { $avg: "$rating" },
-                    totalReviews: { $sum: 1 }
-                }
-            }
+                    totalReviews: { $sum: 1 },
+                },
+            },
         ]);
 
         const reviews = await Review.find({ bookId: bookId });
-
-        if (!reviews || reviews.length === 0) {
-            return res.status(404).json({
-                message: "No reviews found for this book.",
-                averageRating: null,
-                totalReviews: 0
-            });
-        }
 
         const { averageRating = 0, totalReviews = 0 } = aggregateResult[0] || {};
 
         return res.status(200).json({
             averageRating: averageRating.toFixed(2),
             totalReviews,
-            reviews
+            reviews,
         });
     } catch (error) {
         console.error("Error fetching reviews:", error);
         return res.status(500).json({ error: "Internal server error." });
     }
 };
+
 
 
 const addReview = async (req, res) => {
