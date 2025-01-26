@@ -13,6 +13,7 @@ export default function SearchResults() {
     const searchParams = useSearchParams();
     const router = useRouter();
 
+    const [selectedTitle, setSelectedTitle] = useState('');
     const [selectedCategories, setSelectedCategories] = useState([]);
     const [selectedAuthors, setSelectedAuthors] = useState([]);
     const [minPrice, setMinPrice] = useState('');
@@ -20,88 +21,76 @@ export default function SearchResults() {
     const [categoriesExpanded, setCategoriesExpanded] = useState(false);
     const [authorsExpanded, setAuthorsExpanded] = useState(false);
 
-
-    const fetchBooks = async () => {
+    const updateURLWithFilters = () => {
         const queryParams = new URLSearchParams();
 
-        const title = searchParams.get('title');
+        if (selectedTitle) queryParams.set('title', selectedTitle);
+        if (selectedCategories.length > 0) queryParams.set('categories', selectedCategories.join(','));
+        if (selectedAuthors.length > 0) queryParams.set('authors', selectedAuthors.join(','));
+        if (minPrice) queryParams.set('minPrice', minPrice);
+        if (maxPrice) queryParams.set('maxPrice', maxPrice);
+
+        router.push(`/search?${queryParams.toString()}`);
+    };
+
+    useEffect(() => {
+        const titleParam = searchParams.get('title');
         const categoriesParam = searchParams.get('categories');
         const authorsParam = searchParams.get('authors');
         const minPriceParam = searchParams.get('minPrice');
         const maxPriceParam = searchParams.get('maxPrice');
 
-        if (title) queryParams.append('title', title);
-        if (categoriesParam) queryParams.append('categories', categoriesParam);
-        if (authorsParam) queryParams.append('authors', authorsParam);
-        if (minPriceParam) queryParams.append('minPrice', minPriceParam);
-        if (maxPriceParam) queryParams.append('maxPrice', maxPriceParam);
-
-        const queryString = queryParams.toString() ? `?${queryParams.toString()}` : '';
-        try {
-            const response = await fetch(`http://localhost:5000/api/books/search${queryString}`);
-            if (!response.ok) {
-                throw new Error(`Error: ${response.status}`);
-            }
-            const data = await response.json();
-            setBooks(data);
-            setError(null);
-        } catch (err) {
-            setError('Books not found or failed to fetch books. Please try again.');
-            setBooks([]);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-
-    const fetchFilters = async () => {
-        try {
-            const [categoriesResponse, authorsResponse] = await Promise.all([
-                fetch('http://localhost:5000/api/categories'),
-                fetch('http://localhost:5000/api/books/authors'),
-            ]);
-
-            if (categoriesResponse.ok && authorsResponse.ok) {
-                const categoriesData = await categoriesResponse.json();
-                const authorsData = await authorsResponse.json();
-                setCategories(categoriesData);
-                setAuthors(authorsData);
-            } else {
-                throw new Error('Failed to fetch filters.');
-            }
-        } catch (err) {
-            setError('Failed to fetch filters.');
-        }
-    };
-
-    // selectedCategory -> params
-    useEffect(() => {
-        const categoriesParam = searchParams.get('categories');
-        if (categoriesParam) {
-            setSelectedCategories(categoriesParam.split(','));
-        } else {
-            setSelectedCategories([]);
-        }
+        setSelectedTitle(titleParam || '');
+        setSelectedCategories(categoriesParam ? categoriesParam.split(',') : []);
+        setSelectedAuthors(authorsParam ? authorsParam.split(',') : []);
+        setMinPrice(minPriceParam || '');
+        setMaxPrice(maxPriceParam || '');
     }, [searchParams]);
 
-    // url -> seleted category
     useEffect(() => {
-        const queryParams = new URLSearchParams(searchParams.toString());
-        if (selectedCategories.length > 0) {
-            queryParams.set('categories', selectedCategories.join(','));
-        } else {
-            queryParams.delete('categories');
-        }
-        router.push(`/search?${queryParams.toString()}`);
-    }, [selectedCategories, searchParams, router]);
+        const fetchBooks = async () => {
+            setLoading(true);
+            const queryParams = new URLSearchParams(searchParams.toString());
+            try {
+                const response = await fetch(`http://localhost:5000/api/books/search?${queryParams.toString()}`);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch books.');
+                }
+                const data = await response.json();
+                setBooks(data);
+                setError(null);
+            } catch (err) {
+                setError('Books not found or failed to fetch books. Please try again.');
+                setBooks([]);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchBooks();
+    }, [searchParams]);
 
     useEffect(() => {
+        const fetchFilters = async () => {
+            try {
+                const [categoriesResponse, authorsResponse] = await Promise.all([
+                    fetch('http://localhost:5000/api/categories'),
+                    fetch('http://localhost:5000/api/books/authors'),
+                ]);
+
+                if (categoriesResponse.ok && authorsResponse.ok) {
+                    setCategories(await categoriesResponse.json());
+                    setAuthors(await authorsResponse.json());
+                } else {
+                    throw new Error('Failed to fetch filters.');
+                }
+            } catch (err) {
+                setError('Failed to fetch filters.');
+            }
+        };
+
         fetchFilters();
     }, []);
-
-    useEffect(() => {
-        fetchBooks();
-    }, [selectedCategories, selectedAuthors, minPrice, maxPrice, searchParams]);
 
     const handleCategoryChange = (categoryId) => {
         setSelectedCategories((prev) =>
@@ -114,6 +103,10 @@ export default function SearchResults() {
             prev.includes(authorName) ? prev.filter((name) => name !== authorName) : [...prev, authorName]
         );
     };
+
+    useEffect(() => {
+        updateURLWithFilters();
+    }, [selectedTitle, selectedCategories, selectedAuthors, minPrice, maxPrice]);
 
     const generateFilterSummary = () => {
         const title = searchParams.get('title') || null;
@@ -149,10 +142,10 @@ export default function SearchResults() {
 
     return (
         <div className="flex flex-col md:flex-row bg-gray-100 min-h-screen">
-
             <aside className="md:w-1/4 bg-white p-4 shadow-md">
                 <h2 className="text-lg font-bold mb-4">Filters</h2>
 
+                {/* price */}
                 <div className="mb-6">
                     <h3 className="font-semibold mb-2">Price</h3>
                     <div className="flex space-x-2">
@@ -173,6 +166,7 @@ export default function SearchResults() {
                     </div>
                 </div>
 
+                {/* category */}
                 <div className="mb-6">
                     <h3
                         className="font-semibold mb-2 cursor-pointer"
@@ -199,6 +193,7 @@ export default function SearchResults() {
                     )}
                 </div>
 
+                {/* author */}
                 <div className="mb-6">
                     <h3
                         className="font-semibold mb-2 cursor-pointer"

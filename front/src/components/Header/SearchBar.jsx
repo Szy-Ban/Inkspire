@@ -10,6 +10,7 @@ export default function SearchBar() {
 
     const handleSearch = () => {
         router.push(`/search?title=${encodeURIComponent(searchQuery)}`);
+        setSearchQuery('');
     };
 
     const handleKeyDown = (e) => {
