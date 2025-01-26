@@ -123,54 +123,52 @@ const deleteBook = async (req, res) => {
 
 const searchBooks = async (req, res) => {
     try {
-        const { category, title, author, minPrice, maxPrice } = req.query;
+        const { categories, authors, title, minPrice, maxPrice } = req.query;
 
         const filter = {};
 
-        if (category) {
-            const categoryData = await Category.findOne({ name: { $regex: category, $options: 'i' } });
-            if (!categoryData) {
-                return res.status(404).json({ error: "Category not found" });
-            }
-            filter.categoryId = categoryData._id;
+        if (categories) {
+            const categoryIds = categories.split(',');
+            filter.categoryId = { $in: categoryIds };
+        }
+
+        if (authors) {
+            const authorList = authors.split(',');
+            filter.author = { $in: authorList };
         }
 
         if (title) {
             filter.title = { $regex: title, $options: 'i' };
         }
 
-        if (author) {
-            filter.author = { $regex: author, $options: 'i' };
-        }
-
         if (minPrice || maxPrice) {
             filter.price = {};
-            if (minPrice) {
-                if (isNaN(minPrice)) {
-                    return res.status(400).json({ error: "minPrice must be a valid number" });
-                }
-                filter.price.$gte = Number(minPrice);
-            }
-            if (maxPrice) {
-                if (isNaN(maxPrice)) {
-                    return res.status(400).json({ error: "maxPrice must be a valid number" });
-                }
-                filter.price.$lte = Number(maxPrice);
-            }
+            if (minPrice) filter.price.$gte = Number(minPrice);
+            if (maxPrice) filter.price.$lte = Number(maxPrice);
         }
 
         const books = await Book.find(filter).populate('categoryId', 'name');
 
         if (books.length === 0) {
-            return res.status(404).json({ error: "No books found matching the criteria" });
+            return res.status(404).json({ error: 'No books found matching the criteria.' });
         }
 
         return res.status(200).json(books);
-
     } catch (err) {
         return res.status(400).json(err);
     }
-}
+};
+
+
+const getAuthors = async (req, res) => {
+    try {
+        const authors = await Book.distinct('author');
+        return res.status(200).json(authors);
+    } catch (err) {
+        return res.status(400).json({ error: 'Failed to fetch authors', details: err });
+    }
+};
+
 
 const getCategoriesWithBooks = async (req, res) => {
     try {
@@ -200,5 +198,6 @@ module.exports = {
     updateBook,
     deleteBook,
     searchBooks,
-    getCategoriesWithBooks
+    getCategoriesWithBooks,
+    getAuthors
 }

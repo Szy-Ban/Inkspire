@@ -5,6 +5,7 @@ const verifyToken = require('../middlewares/verifyToken')
 const checkAdminRole = require('../middlewares/checkAdminRole')
 
 router.get('/search', booksController.searchBooks)
+router.get('/authors', booksController.getAuthors);
 
 router.get('/', booksController.getAllBooks)
 router.get('/:id', booksController.getBookById)
