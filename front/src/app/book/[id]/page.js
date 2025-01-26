@@ -19,12 +19,11 @@ export default function BookDetails() {
     const [userReview, setUserReview] = useState(null);
     const [quantity, setQuantity] = useState(1);
     const [showPopup, setShowPopup] = useState(false);
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
 
     const fetchReviews = async () => {
         try {
-            const reviewsResponse = await fetch(`http://localhost:5000/api/reviews?bookId=${id}`, {
-                headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
-            });
+            const reviewsResponse = await fetch(`http://localhost:5000/api/reviews?bookId=${id}`);
 
             if (!reviewsResponse.ok) throw new Error('Failed to fetch reviews');
 
@@ -38,7 +37,14 @@ export default function BookDetails() {
         }
     };
 
+    const checkLoginStatus = () => {
+        const token = localStorage.getItem('token');
+        setIsLoggedIn(!!token);
+    };
+
     useEffect(() => {
+        checkLoginStatus();
+
         if (!id) return;
 
         const fetchBookDetails = async () => {
@@ -61,6 +67,8 @@ export default function BookDetails() {
     }, [id]);
 
     const handleAddToCart = async () => {
+        if (!isLoggedIn) return;
+
         try {
             const response = await fetch('http://localhost:5000/api/carts/cart/items', {
                 method: 'POST',
@@ -105,6 +113,8 @@ export default function BookDetails() {
                 .required('Comment is required'),
         }),
         onSubmit: async (values, { resetForm }) => {
+            if (!isLoggedIn) return;
+
             try {
                 const response = await fetch(`http://localhost:5000/api/reviews`, {
                     method: 'POST',
@@ -123,20 +133,6 @@ export default function BookDetails() {
             }
         },
     });
-
-    const handleDeleteReview = async () => {
-        try {
-            const response = await fetch(`http://localhost:5000/api/reviews/${userReview._id}`, {
-                method: 'DELETE',
-                headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
-            });
-
-            if (!response.ok) throw new Error('Failed to delete review');
-            await fetchReviews();
-        } catch (err) {
-            alert('Failed to delete review.');
-        }
-    };
 
     if (loading) {
         return <p className="text-center mt-8 text-gray-600">Loading...</p>;
@@ -178,51 +174,59 @@ export default function BookDetails() {
                                     +
                                 </Button>
                             </div>
-                            <Button variant="primary" size="medium" onClick={handleAddToCart}>
-                                Add to Cart
+                            <Button
+                                variant="primary"
+                                size="medium"
+                                onClick={handleAddToCart}
+                                disabled={!isLoggedIn}
+                            >
+                                {isLoggedIn ? 'Add to Cart' : 'Log in to Add to Cart'}
                             </Button>
                         </div>
                     </div>
 
                     <div className="bg-white p-6 rounded shadow-md">
                         <h2 className="text-xl font-bold mb-4">Reviews</h2>
-                        {userReview ? (
-                            <div className="mb-4 p-4 border rounded bg-gray-50">
-                                <h3 className="font-semibold text-lg mb-2">Your Review</h3>
-                                <p className="text-sm">Rating: {userReview.rating} / 5</p>
-                                <p className="text-sm mb-3">{userReview.comment}</p>
-                                <Button variant="danger" size="small" onClick={handleDeleteReview}>
-                                    Delete Your Review
-                                </Button>
-                            </div>
+                        {isLoggedIn ? (
+                            userReview ? (
+                                <div className="mb-4 p-4 border rounded bg-gray-50">
+                                    <h3 className="font-semibold text-lg mb-2">Your Review</h3>
+                                    <p className="text-sm">Rating: {userReview.rating} / 5</p>
+                                    <p className="text-sm mb-3">{userReview.comment}</p>
+                                    <Button variant="danger" size="small">
+                                        Delete Your Review
+                                    </Button>
+                                </div>
+                            ) : (
+                                <form onSubmit={formik.handleSubmit} className="mb-4">
+                                    <h3 className="font-semibold text-lg mb-2">Add Your Review</h3>
+                                    <input
+                                        type="number"
+                                        max={5}
+                                        min={1}
+                                        {...formik.getFieldProps('rating')}
+                                        className="border rounded w-full p-2 mb-2"
+                                        placeholder="Rating (1-5)"
+                                    />
+                                    {formik.touched.rating && formik.errors.rating && (
+                                        <p className="text-red-500 text-sm">{formik.errors.rating}</p>
+                                    )}
+                                    <textarea
+                                        {...formik.getFieldProps('comment')}
+                                        className="border rounded w-full p-2 mb-2"
+                                        placeholder="Comment"
+                                    ></textarea>
+                                    {formik.touched.comment && formik.errors.comment && (
+                                        <p className="text-red-500 text-sm">{formik.errors.comment}</p>
+                                    )}
+                                    <Button type="submit" variant="secondary" size="small">
+                                        Submit Review
+                                    </Button>
+                                </form>
+                            )
                         ) : (
-                            <form onSubmit={formik.handleSubmit} className="mb-4">
-                                <h3 className="font-semibold text-lg mb-2">Add Your Review</h3>
-                                <input
-                                    type="number"
-                                    max={5}
-                                    min={1}
-                                    {...formik.getFieldProps('rating')}
-                                    className="border rounded w-full p-2 mb-2"
-                                    placeholder="Rating (1-5)"
-                                />
-                                {formik.touched.rating && formik.errors.rating && (
-                                    <p className="text-red-500 text-sm">{formik.errors.rating}</p>
-                                )}
-                                <textarea
-                                    {...formik.getFieldProps('comment')}
-                                    className="border rounded w-full p-2 mb-2"
-                                    placeholder="Comment"
-                                ></textarea>
-                                {formik.touched.comment && formik.errors.comment && (
-                                    <p className="text-red-500 text-sm">{formik.errors.comment}</p>
-                                )}
-                                <Button type="submit" variant="secondary" size="small">
-                                    Submit Review
-                                </Button>
-                            </form>
+                            <p className="text-gray-500">Log in to add or edit reviews.</p>
                         )}
-
                         {reviews.length > 0 ? (
                             <div>
                                 <p className="text-sm text-gray-700 mb-4">
@@ -232,7 +236,7 @@ export default function BookDetails() {
                                     {reviews.map((review) => (
                                         <li key={review._id} className="border-t pt-4">
                                             <p className="font-semibold">
-                                                {review.userId.name} {review.userId.surname}
+                                                {review.userId?.name || 'Anonymous'} {review.userId?.surname || ''}
                                             </p>
                                             <p className="text-sm text-gray-500">{review.rating} / 5</p>
                                             <p className="text-gray-600">{review.comment}</p>
