@@ -9,7 +9,7 @@ export default function Home() {
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const router = useRouter(); // Router for navigation
+    const router = useRouter();
 
     const fetchBooksByCategory = async () => {
         try {
