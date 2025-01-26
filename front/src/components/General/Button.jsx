@@ -3,6 +3,7 @@ export default function Button({ variant = "primary", size = "medium", children,
     const variants = {
         primary: "bg-gradient-to-b from-primaryBlue to-secondaryBlue text-white hover:opacity-90 shadow",
         secondary: "bg-transparent text-primaryBlue border border-primaryBlue hover:bg-primaryBlue hover:text-white",
+        secondaryRev: "bg-primaryBlue text-white border border-primaryBlue hover:bg-transparent hover:text-primaryBlue",
         submit: "w-full bg-gradient-to-b from-primaryBlue to-secondaryBlue text-white py-3 px-6 rounded shadow hover:opacity-90 transition-opacity",
     };
     const sizes = {
