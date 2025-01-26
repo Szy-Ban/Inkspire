@@ -7,23 +7,18 @@ export default function UserProfile({ onLogout }) {
 
     const handleLogout = async () => {
         try {
-            const response = await fetch("http://localhost:5000/auth/logout", {
+            await fetch("http://localhost:5000/auth/logout", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    Authorization: `Bearer ${localStorage.getItem("token")}`,
                 },
             });
-
-            if (response.ok) {
-                localStorage.removeItem("token");
-                onLogout();
-                router.push("/");
-            } else {
-                console.error("Failed to log out.");
-            }
         } catch (error) {
             console.error("Error logging out:", error);
+        } finally {
+            localStorage.removeItem("token");
+            onLogout();
+            router.push("/");
         }
     };
 
@@ -39,7 +34,6 @@ export default function UserProfile({ onLogout }) {
             >
                 Logout
             </Button>
-
         </div>
     );
 }
