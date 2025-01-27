@@ -5,16 +5,14 @@ import { useEffect, useState } from "react";
 export default function CartIcon() {
     const router = useRouter();
     const [cartCount, setCartCount] = useState(0);
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
 
     useEffect(() => {
-        const token = localStorage.getItem('token');
-        setIsLoggedIn(!!token);
+        const token = localStorage.getItem("token");
 
         if (token) {
             const fetchCartCount = async () => {
                 try {
-                    const response = await fetch('http://localhost:5000/api/carts/cart', {
+                    const response = await fetch("http://localhost:5000/api/carts/cart", {
                         headers: { Authorization: `Bearer ${token}` },
                     });
 
@@ -23,7 +21,7 @@ export default function CartIcon() {
                         setCartCount(data.items.length || 0);
                     }
                 } catch (error) {
-                    console.error('Failed to fetch cart count:', error);
+                    console.error("Failed to fetch cart count:", error);
                 }
             };
 
@@ -35,12 +33,10 @@ export default function CartIcon() {
         }
     }, []);
 
-    if (!isLoggedIn) return null;
-
     return (
         <div
-            className="relative cursor-pointer"
-            onClick={() => router.push('/cart')}
+            className="relative cursor-pointer mr-4"
+            onClick={() => router.push("/cart")}
         >
             <FaShoppingCart className="w-8 h-8 text-primaryBlue" />
             {cartCount > 0 && (
