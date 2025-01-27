@@ -114,7 +114,7 @@ export default function Orders() {
                             <ul className="ml-4 list-disc">
                                 {order.items.map((item) => (
                                     <li key={item.bookId}>
-                                        {item.title} - {item.quantity} × ${item.price.toFixed(2)}
+                                        Book (byId): {item.bookId} - {item.quantity} × ${item.price.toFixed(2)}
                                     </li>
                                 ))}
                             </ul>

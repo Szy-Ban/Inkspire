@@ -10,30 +10,31 @@ export default function Cart() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    useEffect(() => {
-        const fetchCart = async () => {
-            try {
-                const response = await fetch('http://localhost:5000/api/carts/cart', {
-                    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
-                });
+    const fetchCart = async () => {
+        try {
+            const response = await fetch('http://localhost:5000/api/carts/cart', {
+                headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+            });
 
-                if (!response.ok) {
-                    if (response.status === 404) {
-                        setCart({ items: [] });
-                    } else {
-                        throw new Error('Failed to fetch cart');
-                    }
+            if (!response.ok) {
+                if (response.status === 404) {
+                    setCart({ items: [] });
                 } else {
-                    const data = await response.json();
-                    setCart(data);
+                    throw new Error('Failed to fetch cart');
                 }
-            } catch (err) {
-                console.error(err);
-                setError('Failed to load cart.');
-            } finally {
-                setLoading(false);
+            } else {
+                const data = await response.json();
+                setCart(data);
             }
-        };
+        } catch (err) {
+            console.error(err);
+            setError('Failed to load cart.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
 
         fetchCart();
     }, []);
@@ -52,6 +53,7 @@ export default function Cart() {
             if (!response.ok) throw new Error('Failed to remove item');
             const updatedCart = await response.json();
             setCart(updatedCart.cart);
+            fetchCart()
         } catch (err) {
             alert('Failed to remove item.');
         }
@@ -86,9 +88,9 @@ export default function Cart() {
             {cart.items.length > 0 ? (
                 <>
                     <ul className="mb-6">
-                        {cart.items.map((item) => (
+                        {cart.items.map((item, index) => (
                             <li
-                                key={item.bookId._id}
+                                key={`${item.bookId._id}-${index}`}
                                 className="flex justify-between items-center p-4 bg-white shadow rounded mb-4"
                             >
                                 <div className="flex items-center">
@@ -114,6 +116,7 @@ export default function Cart() {
                             </li>
                         ))}
                     </ul>
+
                     <div className="flex justify-between items-center">
                         <p className="text-lg font-bold">
                             Total Price: $
